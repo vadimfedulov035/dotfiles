@@ -1,43 +1,65 @@
 local M = {}
 
--- Core LSP on_attach
-M.lsp_on_attach = function(client, bufnr)
-	vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+local wk = require("which-key")
 
-	-- LSP Actions
-	vim.keymap.set("n", "K",  vim.lsp.buf.hover, { buffer = bufnr})
+M.lsp_on_attach = function(_, bufnr)
+    -- Register LSP keymaps with which-key
+    wk.add({
+        -- Hover documentation
+	{ mode = "n", buffer = bufnr },
+        { "<leader>N", "<cmd>Neotree<CR>", desc = "Tree"},
+        { "<leader><ESC>", "<cmd>Neotree close<CR>", desc = "Close Tree"},
+        { "<leader>K", "<cmd>Lspsaga hover_doc<CR>", desc = "Hover Documentation"},
 
-	-- Goto definitions
-	vim.keymap.set("n", "gd", vim.lsp.buf.definition, {buffer = bufnr})
-	vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, {buffer = bufnr})
-	vim.keymap.set("n", "gi", vim.lsp.buf.implementation, {buffer = bufnr})
+        -- Goto group
+        { "<leader>g", group = "Goto" },
+        { "<leader>gd", vim.lsp.buf.definition, desc = "Definition"},
+        { "<leader>gt", vim.lsp.buf.type_definition, desc = "Type Definition"},
+        { "<leader>gi", vim.lsp.buf.implementation, desc = "Implementation"},
 
-	-- Peek definitions
-	vim.keymap.set("n", "pd", "<cmd>Lspsaga peek_definition<CR>", {buffer = bufnr})
-	vim.keymap.set("n", "pt", "<cmd>Lspsaga peek_type_definition<CR>", {buffer = bufnr})
-	vim.keymap.set("n", "pi", "<cmd>Lspsaga peek_implementation<CR>", {buffer = bufnr})
-	-- Floating window management
-	vim.keymap.set("n", "<Esc>", saga.action.close_all_floats, {buffer = bufnr})
+        -- Peek group
+        { "<leader>p", group = "Peek" },
+        { "<leader>pd", "<cmd>Lspsaga peek_definition<CR>", desc = "Peek Definition"},
+        { "<leader>pt", "<cmd>Lspsaga peek_type_definition<CR>", desc = "Peek Type Definition"},
+        { "<leader>pi", "<cmd>Lspsaga peek_implementation<CR>", desc = "Peek Implementation"},
+    })
 end
 
---- EXTRA KEY MAPPINGS (import in module)
--- GitSigns key mappings
-M.gitsigns_on_attach = function(_, bufnr)
-	local gs = package.loaded.gitsigns
+M.git_on_attach = function(_, bufnr)
+    local gs = package.loaded.gitsigns
 
-	vim.keymap.set("n", "]c", gs.next_hunk, "Next Hunk")
-	vim.keymap.set("n", "[c", gs.prev_hunk, "Previous Hunk")
-	vim.keymap.set("n", "<leader>hs", gs.stage_hunk, "Stage Hunk")
-	vim.keymap.set("n", "<leader>hr", gs.reset_hunk, "Reset Hunk")
-	vim.keymap.set("v", "<leader>hs", function() gs.stage_hunk({vim.fn.line("."), vim.fn.line("v")}) end, "Stage Visual Hunk")
-	vim.keymap.set("v", "<leader>hr", function() gs.reset_hunk({vim.fn.line("."), vim.fn.line("v")}) end, "Reset Visual Hunk")
-	vim.keymap.set("n", "<leader>hS", gs.stage_buffer, "Stage Buffer")
-	vim.keymap.set("n", "<leader>hu", gs.undo_stage_hunk, "Undo Stage")
-	vim.keymap.set("n", "<leader>hR", gs.reset_buffer, "Reset Buffer")
-	vim.keymap.set("n", "<leader>hp", gs.preview_hunk, "Preview Hunk")
-	vim.keymap.set("n", "<leader>hb", function() gs.blame_line({ full = true }) end, "Blame Line")
-	vim.keymap.set("n", "<leader>hd", gs.diffthis, "Diff This")
-	vim.keymap.set("n", "<leader>hD", function() gs.diffthis("~") end, "Diff Against HEAD~")
+    -- Register GitSigns keymaps with which-key
+    wk.add({
+	{mode = "n", buffer = bufnr },
+        -- Navigation between hunks
+        { "]c", gs.next_hunk, desc = "Next Hunk"},
+        { "[c", gs.prev_hunk, desc = "Previous Hunk"},
+
+        -- Hunk operations group
+        { "<leader>h", group = "Hunk Operations" },
+        { "<leader>hs", gs.stage_hunk,      desc = "Stage Hunk"},
+        { "<leader>hr", gs.reset_hunk,      desc = "Reset Hunk"},
+        { "<leader>hS", gs.stage_buffer,    desc = "Stage Buffer"},
+        { "<leader>hu", gs.undo_stage_hunk, desc = "Undo Stage"},
+        { "<leader>hR", gs.reset_buffer,    desc = "Reset Buffer"},
+        { "<leader>hp", gs.preview_hunk,    desc = "Preview Hunk"},
+        { "<leader>hb", function() gs.blame_line({ full = true }) end, desc = "Blame Line"},
+        { "<leader>hd", gs.diffthis,        desc = "Diff This"},
+        { "<leader>hD", function() gs.diffthis("~") end, desc = "Diff Against HEAD~"},
+
+        -- Visual mode specific mappings
+        { "<leader>hs", function()
+              gs.stage_hunk({vim.fn.line("."), vim.fn.line("v")})
+	end, desc = "Stage Visual Hunk", mode = "v", buffer = bufnr },
+	{ "<leader>hr", function()
+              gs.reset_hunk({vim.fn.line("."), vim.fn.line("v")})
+          end, desc = "Reset Visual Hunk", mode = "v", buffer = bufnr },
+    })
+end
+
+M.on_attach = function(_, bufnr)
+	M.lsp_on_attach(_, bufnr)
+	M.git_on_attach(_, bufnr)
 end
 
 -- Completion key mappings
@@ -71,6 +93,5 @@ M.get_cmp_mappings = function()
 		end, { "i", "s" }),
 	}
 end
-
 
 return M

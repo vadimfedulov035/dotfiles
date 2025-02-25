@@ -2,11 +2,11 @@ return {
   settings = {
     gopls = {
       analyses = {
-        unusedparams = true, -- Unused function parameters (you already have this)
+        unusedparams = true,    -- Unused function parameters (you already have this)
         unusedvariable = true,  -- Unused local variables
-        unreachable = true,  -- Unreachable code (e.g., after return)
-        nilness = true,  -- Potential nil pointer dereferences
-        shadow = true,  -- Shadowed variables (accidental variable reuse)
+        unreachable = true,     -- Unreachable code
+        nilness = true,         -- Potential nil pointer dereferences
+        shadow = true,          -- Shadowed variables (accidental variable reuse)
         unusedwrite = true,  -- Unused variable writes (e.g., reassigned before read)
         useany = true,  -- Discourages `interface{}` where possible
         ST1003 = true,  -- Enforces idiomatic error naming (e.g., `errFoo`, not `fooError`)
@@ -29,5 +29,5 @@ return {
 	completeUnimported = true,  -- Auto-suggest imports for unimported packages
 	semanticTokens = false,     -- Enables semantic highlighting (colorizes symbols semantically)
     },
-  },				
+  },
 }

@@ -2,71 +2,35 @@ local M = {}
 
 local wk = require("which-key")
 
-M.lsp_on_attach = function(_, bufnr)
+M.on_attach = function(_, bufnr)
+	local tl = require("telescope.builtin")
+
 	-- Register LSP keymaps with which-key
 	wk.add({
-		-- Hover documentation
 		{ mode = "n", buffer = bufnr },
+
 		-- Tree group
-		{ "<leader>N", "<cmd>Neotree<CR>", desc = "Tree"},
-		{ "<leader><ESC>", "<cmd>Neotree close<CR>", desc = "Close Tree"},
+		{ "<leader>N", "<cmd>Neotree<CR>", desc = "Tree" },
+		{ "<leader><ESC>", "<cmd>Neotree close<CR>", desc = "Close Tree" },
 
 		-- Base group
-		{ "<leader>K", "<cmd>Lspsaga hover_doc<CR>", desc = "Documentation"},
-		{ "<leader>R", "<cmd>Lspsaga rename<CR>", desc = "Rename"},
+		{ "<leader>K", vim.lsp.buf.hover, desc = "Documentation" },
+		{ "<leader>R", vim.lsp.buf.rename, desc = "Rename" },
 
 		-- Goto group
 		{ "<leader>g", group = "Goto" },
-		{ "<leader>gd", vim.lsp.buf.definition, desc = "Definition"},
-		{ "<leader>gt", vim.lsp.buf.type_definition, desc = "Type Definition"},
-		{ "<leader>gi", vim.lsp.buf.implementation, desc = "Implementation"},
+		{ "<leader>gd", tl.lsp_definitions, desc = "Definition" },
+		{ "<leader>gt", tl.lsp_type_definitions, desc = "Type Definition" },
+		{ "<leader>gi", tl.lsp_implementations, desc = "Implementation" },
+		{ "<leader>gr", tl.lsp_references, desc = "References" },
 
 		-- Peek group
-		{ "<leader>p", group = "Peek" },
-		{ "<leader>pd", "<cmd>Lspsaga peek_definition<CR>", desc = "Definition"},
-		{ "<leader>pt", "<cmd>Lspsaga peek_type_definition<CR>", desc = "Type"},
-		{ "<leader>pi", "<cmd>Lspsaga peek_implementation<CR>", desc = "Implementation"},
+		{ "<leader>rn", vim.lsp.buf.rename, desc = "[R]e[n]ame" },
+		{ "<leader>ca", vim.lsp.buf.code_action, desc = "[C]ode [A]ction" },
 	})
 end
 
-M.git_on_attach = function(_, bufnr)
-	local gs = package.loaded.gitsigns
-
-	-- Register GitSigns keymaps with which-key
-	wk.add({
-		{mode = "n", buffer = bufnr },
-		-- Navigation between hunks
-		{ "]c", gs.next_hunk, desc = "Next Hunk"},
-		{ "[c", gs.prev_hunk, desc = "Previous Hunk"},
-
-		-- Hunk operations group
-		{ "<leader>h", group = "Hunk Operations" },
-		{ "<leader>hs", gs.stage_hunk,      desc = "Stage Hunk"},
-		{ "<leader>hr", gs.reset_hunk,      desc = "Reset Hunk"},
-		{ "<leader>hS", gs.stage_buffer,    desc = "Stage Buffer"},
-		{ "<leader>hu", gs.undo_stage_hunk, desc = "Undo Stage"},
-		{ "<leader>hR", gs.reset_buffer,    desc = "Reset Buffer"},
-		{ "<leader>hp", gs.preview_hunk,    desc = "Preview Hunk"},
-		{ "<leader>hb", function() gs.blame_line({ full = true }) end, desc = "Blame Line"},
-		{ "<leader>hd", gs.diffthis,        desc = "Diff This"},
-		{ "<leader>hD", function() gs.diffthis("~") end, desc = "Diff Against HEAD~"},
-
-		-- Visual mode specific mappings
-		{ "<leader>hs", function()
-			gs.stage_hunk({vim.fn.line("."), vim.fn.line("v")})
-		end, desc = "Stage Visual Hunk", mode = "v", buffer = bufnr },
-		{ "<leader>hr", function()
-			gs.reset_hunk({vim.fn.line("."), vim.fn.line("v")})
-		end, desc = "Reset Visual Hunk", mode = "v", buffer = bufnr },
-	})
-end
-
-M.on_attach = function(_, bufnr)
-	M.lsp_on_attach(_, bufnr)
-	M.git_on_attach(_, bufnr)
-end
-
--- Completion key mappings
+-- Completion key mappings (passed separately)
 M.get_cmp_mappings = function()
 	local cmp = require("cmp")
 	local luasnip = require("luasnip")
@@ -74,7 +38,7 @@ M.get_cmp_mappings = function()
 	return {
 		["<CR>"] = cmp.mapping.confirm({
 			select = false,
-			behavior = cmp.ConfirmBehavior.Insert
+			behavior = cmp.ConfirmBehavior.Insert,
 		}),
 		["<C-Space>"] = cmp.mapping.complete(),
 		["<C-n>"] = cmp.mapping(function(fallback)

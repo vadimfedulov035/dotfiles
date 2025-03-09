@@ -13,6 +13,19 @@ function M.setup()
 		return vim.lsp.get_clients()
 	end
 
+	-- Highlight when yanking
+	vim.api.nvim_create_autocmd('TextYankPost', {
+		desc = 'Highlight when yanking (copying) text',
+		group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+		callback = function()
+			vim.highlight.on_yank()
+		end,
+	})
+
+	-- Case-insensetive searching UNLESS \C or mone or more capital letters
+	vim.opt.ignorecase = true
+	vim.opt.smartcase = true
+
 	-- Enable true color
 	vim.opt.termguicolors = true
 

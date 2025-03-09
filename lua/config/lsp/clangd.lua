@@ -4,6 +4,8 @@ return {
 		'--background-index',
 		'--clang-tidy',
 		'--header-insertion=never',
+		'--tweaks=-std=c23',
+		'--tweaks=-Wno-cpp',
 	},
 	init_options = {
 		fallbackStyle = 'Google',

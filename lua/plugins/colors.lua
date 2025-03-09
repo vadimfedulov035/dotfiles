@@ -11,6 +11,8 @@ return {
 				transparent = { bg = true, float = false, }
 			})
 			require('nordic').load()
+			local theme = require('config.theme')
+			theme.apply_highlights()
 		end
 	}
 }

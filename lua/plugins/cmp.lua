@@ -34,12 +34,11 @@ return {
 				window = {
 					completion = {
 						border = theme.border_style,
-						winhighlight = 'Normal:CmpNormal,FloatBorder:CmpBorder,CursorLine:CmpCursorLine',
+						winhighlight = 'Normal:Pmenu,CursorLine:PmenuSel,Search:None',
 						col_offset = -3,
 						side_padding = 0,
 					},
-					documentation = { border = theme.border_style,
-						winhighlight = 'Normal:CmpDocNormal,FloatBorder:CmpDocBorder', }
+					documentation = { border = theme.border_style }
 				},
 				formatting = {
 					fields = { 'kind', 'abbr', 'menu' },

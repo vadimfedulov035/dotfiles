@@ -16,6 +16,9 @@ function M.setup()
 	-- Enable true color
 	vim.opt.termguicolors = true
 
+	-- Enable line numbers
+	vim.opt.number = true
+
 	-- Tab configuration (4-width tabs by default)
 	vim.opt.expandtab = false  -- Use tabs by default
 	vim.opt.tabstop = 4        -- Visual width of tabs
@@ -31,9 +34,8 @@ function M.setup()
 		end,
 	})
 
-	-- Unified highlighting for column limit and indentation
+	-- Line limit
 	vim.opt.cc = '79'
-	-- Highlight all matches
 	vim.api.nvim_create_autocmd({"BufEnter", "TextChanged", "InsertLeave"}, {
 		pattern = "*",
 		callback = function()

@@ -113,7 +113,7 @@ function M.setup()
 			"lewis6991/gitsigns.nvim",
 			event = "BufReadPre",
 			config = function()
-				local lsp = require("config.lsp")
+				local _ = require("config.lsp")
 				require("gitsigns").setup({
 					signs = {
 						add = { text = "▎" },
@@ -158,21 +158,30 @@ function M.setup()
 				},
 			},
 			opts = {
-				notify_on_error = false,
+				notify_on_error = true,
 				format_on_save = function(_)
-					local lsp_format_opt = "fallback"
 					return {
-						timeout_ms = 500,
-						lsp_format = lsp_format_opt,
+						timeout_ms = 1000,
+						lsp_format = "fallback",
 					}
 				end,
 				formatters_by_ft = {
-					lua = { "stylua" },
-					rust = { "rustfmt" },
 					c = { "clang-format" },
 					cpp = { "clang-format" },
-					python = { "ruff check --fix" },
-					go = { "gofmt -w -s " },
+					lua = { "stylua" },
+					rust = { "rustfmt" },
+					python = { "ruff" },
+					go = { "gofmt" },
+				},
+				formatters = {
+					gofmt = {
+						command = "gofmt",
+						args = { "-s" },
+					},
+					ruff = {
+						command = "ruff",
+						args = { "check", "--fix" },
+					},
 				},
 			},
 		},

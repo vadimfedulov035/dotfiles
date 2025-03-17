@@ -17,11 +17,7 @@ auto_require_servers()
 -- Common base configuration
 M.base_config = {
 	on_attach = require("config.mappings").on_attach,
-	capabilities = vim.tbl_deep_extend(
-		"force",
-		require("cmp_nvim_lsp").default_capabilities(),
-		{ textDocument = { formatting = false } } -- 👈 Add this line
-	),
+	capabilities = require("cmp_nvim_lsp").default_capabilities(),
 }
 
 return M

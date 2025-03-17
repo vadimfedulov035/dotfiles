@@ -55,15 +55,33 @@ function M.setup()
 					},
 					sync_install = false,
 					auto_install = true,
-					ignore_install = {},
-					modules = {},
 					highlight = {
-						enable = false,
+						enable = true,
 						additional_vim_regex_highlighting = false,
+						-- Customize which syntax groups are used
+						custom_captures = {
+							-- Reduce visual noise from these groups
+							["punctuation.bracket"] = "",
+							["constructor"] = "",
+							["constant.builtin"] = "",
+							["variable.builtin"] = "",
+						},
 					},
 					incremental_selection = { enable = true },
 					indent = { enable = true },
 					textobjects = { enable = true },
+				})
+			end,
+		},
+
+		{ -- Auto Pairs
+			"windwp/nvim-autopairs",
+			config = function()
+				require("nvim-autopairs").setup({
+					check_ts = true,
+					disable_filetype = { "TelescopePrompt" },
+					map_bs = true,
+					map_cr = true,
 				})
 			end,
 		},
@@ -125,7 +143,7 @@ function M.setup()
 			end,
 		},
 
-		{ -- Autoformattting
+		{ -- Autoformatting
 			"stevearc/conform.nvim",
 			event = { "BufWritePre" },
 			cmd = { "ConformInfo" },
@@ -141,14 +159,8 @@ function M.setup()
 			},
 			opts = {
 				notify_on_error = false,
-				format_on_save = function(bufnr)
-					local disable_filetypes = { c = true, cpp = true }
-					local lsp_format_opt
-					if disable_filetypes[vim.bo[bufnr].filetype] then
-						lsp_format_opt = "never"
-					else
-						lsp_format_opt = "fallback"
-					end
+				format_on_save = function(_)
+					local lsp_format_opt = "fallback"
 					return {
 						timeout_ms = 500,
 						lsp_format = lsp_format_opt,
@@ -156,8 +168,11 @@ function M.setup()
 				end,
 				formatters_by_ft = {
 					lua = { "stylua" },
+					rust = { "rustfmt" },
+					c = { "clang-format" },
+					cpp = { "clang-format" },
 					python = { "ruff check --fix" },
-					golang = { "gofmt -w -s " },
+					go = { "gofmt -w -s " },
 				},
 			},
 		},

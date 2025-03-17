@@ -1,12 +1,12 @@
 return {
-	{  -- Mason.nvim - Package manager
+	{ -- Mason.nvim - Package manager
 		"williamboman/mason.nvim",
 		config = function()
 			require("mason").setup()
 		end,
 	},
 
-	{  -- Mason LSP config
+	{ -- Mason LSP config
 		"williamboman/mason-lspconfig.nvim",
 		dependencies = { "williamboman/mason.nvim" },
 		config = function()
@@ -17,7 +17,7 @@ return {
 		end,
 	},
 
-	{  -- LSP config
+	{ -- LSP config
 		"neovim/nvim-lspconfig",
 		dependencies = {
 			"williamboman/mason-lspconfig.nvim",
@@ -27,14 +27,14 @@ return {
 		config = function()
 			local lspconfig = require("lspconfig")
 			local lsp = require("config.lsp")
-			-- Configure all servers
+
 			for server_name, server_config in pairs(lsp.servers) do
 				lspconfig[server_name].setup(vim.tbl_deep_extend("force", lsp.base_config, server_config))
 			end
 		end,
 	},
 
-	{  -- LSP Enhancement
+	{ -- LSP Enhancement
 		"ray-x/lsp_signature.nvim",
 		config = function()
 			require("lsp_signature").setup({
@@ -45,5 +45,5 @@ return {
 				},
 			})
 		end,
-	}
+	},
 }

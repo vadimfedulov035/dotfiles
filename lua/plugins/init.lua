@@ -40,6 +40,7 @@ function M.setup()
 			build = ":TSUpdate",
 			config = function()
 				require("nvim-treesitter.configs").setup({
+					modules = {},
 					ensure_installed = {
 						"vim",
 						"vimdoc",
@@ -53,6 +54,7 @@ function M.setup()
 						"markdown",
 						"markdown_inline",
 					},
+					ignore_install = {},
 					sync_install = false,
 					auto_install = true,
 					highlight = {
@@ -86,11 +88,14 @@ function M.setup()
 			end,
 		},
 
-		{ -- WhichKey
+		{
 			"folke/which-key.nvim",
 			event = "VeryLazy",
-			opts = {},
-			keys = {},
+			config = function()
+				-- Register global keys defined in mappings.lua
+				local mappings = require("config.mappings")
+				mappings.setup_global_mappings()
+			end,
 		},
 
 		{ -- Telescope
@@ -159,12 +164,10 @@ function M.setup()
 			},
 			opts = {
 				notify_on_error = true,
-				format_on_save = function(_)
-					return {
-						timeout_ms = 1000,
-						lsp_format = "fallback",
-					}
-				end,
+				format_on_save = {
+					timeout_ms = 1000,
+					lsp_format = "fallback",
+				},
 				formatters_by_ft = {
 					c = { "clang-format" },
 					cpp = { "clang-format" },
@@ -174,13 +177,20 @@ function M.setup()
 					go = { "gofmt" },
 				},
 				formatters = {
+					ruff = {
+						command = "ruff",
+						args = { "format", "--quiet", "-" },
+						stdin = true,
+					},
+					clang_format = {
+						command = "clang-format",
+						args = { "-style=file", "--assume-filename=%:p" },
+						stdin = true,
+					},
 					gofmt = {
 						command = "gofmt",
 						args = { "-s" },
-					},
-					ruff = {
-						command = "ruff",
-						args = { "check", "--fix" },
+						stdin = true,
 					},
 				},
 			},
@@ -235,6 +245,37 @@ function M.setup()
 							return item
 						end,
 					},
+				})
+			end,
+		},
+
+		{ -- Snippet Engine
+			"L3MON4D3/LuaSnip",
+			dependencies = { "rafamadriz/friendly-snippets", "saadparwaiz1/cmp_luasnip" },
+			event = "VeryLazy",
+			config = function()
+				require("luasnip.loaders.from_vscode").lazy_load()
+
+				vim.keymap.set("i", "<leader>ie", function()
+					if vim.bo.filetype ~= "go" then
+						return "<leader>ie"
+					end
+
+					-- *** Defer text modification and expansion ***
+					vim.schedule(function()
+						local ls = require("luasnip")
+						-- 1. Insert trigger text
+						vim.api.nvim_put({ "i", "r" }, "c", true, true)
+						-- 2. Expand the snippet
+						ls.expand()
+					end)
+
+					return ""
+				end, {
+					noremap = true,
+					silent = true,
+					expr = true,
+					desc = "Expand Go 'if err != nil' snippet",
 				})
 			end,
 		},

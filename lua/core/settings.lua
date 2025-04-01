@@ -5,7 +5,8 @@ function M.setup()
 	vim.g.mapleader = " "
 	vim.g.maplocalleader = " "
 
-	-- Sync with system clipboard (Ctrl+C/Ctrl+V)
+	-- Sync default register with system clipboard (+)
+	-- Visual selections often automatically update primary (*) on X11
 	vim.schedule(function()
 		vim.opt.clipboard = "unnamedplus"
 	end)

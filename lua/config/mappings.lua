@@ -1,11 +1,37 @@
 local M = {}
 
-local wk = require("which-key")
+-- Global mappings
+function M.setup_global_mappings()
+	local wk = require("which-key")
+	wk.add({
+		{ mode = "n" },
 
+		-- Diagnostic Mappings
+		{ "<leader>d", group = "Diagnostics" },
+		{ "<leader>de", vim.diagnostic.open_float, desc = "Error Diagnostics" },
+		{ "<leader>dl", vim.diagnostic.setloclist, desc = "List Diagnostics" },
+
+		-- goto_prev/goto_next (wrapped in function)
+		{
+			"d[",
+			function()
+				vim.diagnostic.goto_prev({ wrap = false })
+			end,
+			desc = "Prev Diagnostic",
+		},
+		{
+			"d]",
+			function()
+				vim.diagnostic.goto_next({ wrap = false })
+			end,
+			desc = "Next Diagnostic",
+		},
+	})
+end
+
+-- LSP mappings
 M.on_attach = function(_, bufnr)
-	local tl = require("telescope.builtin")
-
-	-- Register LSP keymaps with which-key
+	local wk = require("which-key")
 	wk.add({
 		{ mode = "n", buffer = bufnr },
 
@@ -13,34 +39,39 @@ M.on_attach = function(_, bufnr)
 		{ "<leader>N", "<cmd>Neotree<CR>", desc = "Tree" },
 		{ "<leader><ESC>", "<cmd>Neotree close<CR>", desc = "Close Tree" },
 
-		-- Base group
+		-- LSP Base group
 		{ "<leader>K", vim.lsp.buf.hover, desc = "Documentation" },
 		{ "<leader>R", vim.lsp.buf.rename, desc = "Rename" },
 
-		-- Goto group
+		-- LSP Goto group
 		{ "<leader>g", group = "Goto" },
-		{ "<leader>gd", tl.lsp_definitions, desc = "Definition" },
-		{ "<leader>gt", tl.lsp_type_definitions, desc = "Type Definition" },
-		{ "<leader>gi", tl.lsp_implementations, desc = "Implementation" },
-		{ "<leader>gr", tl.lsp_references, desc = "References" },
+		{ "<leader>gd", vim.lsp.buf.definition, desc = "Definition" },
+		{ "<leader>gt", vim.lsp.buf.type_definition, desc = "Type Definition" },
+		{ "<leader>gi", vim.lsp.buf.implementation, desc = "Implementation" },
+		{ "<leader>gr", vim.lsp.buf.references, desc = "References (Quickfix)" },
+		{ "<leader>gD", vim.lsp.buf.declaration, desc = "Declaration" },
 
-		-- Peek group
-		{ "<leader>rn", vim.lsp.buf.rename, desc = "[R]e[n]ame" },
+		-- LSP Code Actions
 		{ "<leader>ca", vim.lsp.buf.code_action, desc = "[C]ode [A]ction" },
 	})
 end
 
--- Completion key mappings (passed separately)
+-- Completion mappings (passed in plugins)
 M.get_cmp_mappings = function()
 	local cmp = require("cmp")
 	local luasnip = require("luasnip")
 
 	return {
+		-- Confirm
 		["<CR>"] = cmp.mapping.confirm({
 			select = false,
 			behavior = cmp.ConfirmBehavior.Insert,
 		}),
+
+		-- Complete
 		["<C-Space>"] = cmp.mapping.complete(),
+
+		-- Next
 		["<C-n>"] = cmp.mapping(function(fallback)
 			if cmp.visible() then
 				cmp.select_next_item()
@@ -50,6 +81,8 @@ M.get_cmp_mappings = function()
 				fallback()
 			end
 		end, { "i", "s" }),
+
+		-- Prev
 		["<C-p>"] = cmp.mapping(function(fallback)
 			if cmp.visible() then
 				cmp.select_prev_item()
